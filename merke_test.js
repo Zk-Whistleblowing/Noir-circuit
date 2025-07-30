@@ -1,21 +1,7 @@
 import { IndexedMerkleTree } from 'indexed-merkle-noir';
-import * as circomlibjs from 'circomlibjs';
 
 // 1. 트리 초기화
 const tree = new IndexedMerkleTree();
-
-// let poseidonOpt;
-// let poseidonReference;
-// let poseidonWasm;
-// poseidonOpt = await circomlibjs.buildPoseidonOpt();
-// poseidonReference = await circomlibjs.buildPoseidonReference();
-// poseidonWasm = await circomlibjs.buildPoseidon();
-
-// // Poseidon 해시 → 0x hex string 변환 함수
-// function poseidonHashHex(inputs) {
-//   const hashBytes = poseidonReference(inputs);
-//   return BigInt('0x' + Buffer.from(hashBytes).toString('hex'));
-// }
 
 // 2. 데이터 준비
 const ids = [
@@ -70,11 +56,6 @@ for (let i = 0; i < ids.length; i++) {
 
 // 5. 특정 id의 증명 생성 (예: id=6)
 const proof = tree.generateProof(6n);
-
-// BigInt → 0x hex 변환 함수
-// function toHex(v) {
-//   return '0x' + v.toString(16).padStart(64, '0');
-// }
 
 console.log(proof);
 
