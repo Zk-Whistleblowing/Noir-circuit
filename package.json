@@ -1,0 +1,25 @@
+{
+  "name": "project_circuit",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Zk-Whistleblowing/Noir-circuit#readme",
+  "bugs": {
+    "url": "https://github.com/Zk-Whistleblowing/Noir-circuit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zk-Whistleblowing/Noir-circuit.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "merke_test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "circomlibjs": "^0.1.7",
+    "indexed-merkle-noir": "^0.0.5",
+    "merkletreejs": "^0.5.2"
+  }
+}

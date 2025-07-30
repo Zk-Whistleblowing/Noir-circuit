@@ -1,70 +1,83 @@
+import { IndexedMerkleTree } from 'indexed-merkle-noir';
 import * as circomlibjs from 'circomlibjs';
-import { MerkleTree } from 'merkletreejs';
 
-// BigInt -> Buffer 변환 함수 (32 bytes, big endian)
-function bigIntToBuffer(num) {
-  let hex = num.toString(16);
-  if (hex.length % 2) hex = '0' + hex;
-  const buf = Buffer.from(hex, 'hex');
-  if (buf.length < 32) {
-    const pad = Buffer.alloc(32 - buf.length);
-    return Buffer.concat([pad, buf]);
-  }
-  return buf;
+// 1. 트리 초기화
+const tree = new IndexedMerkleTree();
+
+// let poseidonOpt;
+// let poseidonReference;
+// let poseidonWasm;
+// poseidonOpt = await circomlibjs.buildPoseidonOpt();
+// poseidonReference = await circomlibjs.buildPoseidonReference();
+// poseidonWasm = await circomlibjs.buildPoseidon();
+
+// // Poseidon 해시 → 0x hex string 변환 함수
+// function poseidonHashHex(inputs) {
+//   const hashBytes = poseidonReference(inputs);
+//   return BigInt('0x' + Buffer.from(hashBytes).toString('hex'));
+// }
+
+// 2. 데이터 준비
+const ids = [
+  1n,
+  2n,
+  3n,
+  4n,
+  5n,
+  6n,
+  7n,
+  8n,
+  9n,
+  10n,
+  11n,
+  12n,
+  13n,
+  14n,
+  15n,
+  16n,
+  17n,
+  18n,
+  19n,
+  20n,
+];
+const pws = [
+  1001n,
+  1002n,
+  1003n,
+  1004n,
+  1005n,
+  1006n,
+  1007n,
+  1008n,
+  1009n,
+  1010n,
+  1011n,
+  1012n,
+  1013n,
+  1014n,
+  1015n,
+  1016n,
+  1017n,
+  1018n,
+  1019n,
+  1020n,
+];
+
+// 3. 트리에 Poseidon 해시(hex) 삽입
+for (let i = 0; i < ids.length; i++) {
+  tree.insertItem(ids[i], pws[i]);
 }
 
-// Buffer -> BigInt 배열 변환 (각 32bit씩)
-function bufferToBigIntArray(buffer) {
-  const res = [];
-  for (let i = 0; i < buffer.length; i += 32) {
-    const slice = buffer.slice(i, i + 32);
-    res.push(BigInt('0x' + slice.toString('hex')));
-  }
-  return res;
-}
+// 5. 특정 id의 증명 생성 (예: id=6)
+const proof = tree.generateProof(6n);
 
-async function main() {
-  const poseidon = await circomlibjs.buildPoseidon();
+// BigInt → 0x hex 변환 함수
+// function toHex(v) {
+//   return '0x' + v.toString(16).padStart(64, '0');
+// }
 
-  // poseidon 해시 함수, Buffer(바이트 배열) 입력 처리
-  function poseidonHash(data) {
-    // data는 Buffer, 이를 BigInt 배열로 변환
-    const inputBigInts = bufferToBigIntArray(data);
-    const hashBigInt = poseidon(inputBigInts);
-    return bigIntToBuffer(hashBigInt);
-  }
+console.log(proof);
 
-  // 사원 id, pw를 Buffer로 합치기
-  function encodeLeaf(id, pw) {
-    // id와 pw를 각각 32바이트 버퍼로 변환하고 연결
-    const bufId = Buffer.alloc(32);
-    bufId.writeBigUInt64BE(BigInt(id), 24); // 뒤쪽에 숫자 기록 (64bit)
-    const bufPw = Buffer.alloc(32);
-    bufPw.writeBigUInt64BE(BigInt(pw), 24);
-    return Buffer.concat([bufId, bufPw]); // 64 bytes total
-  }
-
-  const employees = [
-    { id: 1, pw: 1234 },
-    { id: 2, pw: 5678 },
-    { id: 3, pw: 9999 },
-  ];
-
-  // leaf: id+pw buffer → 해시된 buffer
-  const leaves = employees.map((e) => poseidonHash(encodeLeaf(e.id, e.pw)));
-
-  // merkletreejs에 맞게 해시함수 재정의: 단일 Buffer 입력, Buffer 출력
-  const tree = new MerkleTree(leaves, poseidonHash, { sortPairs: true });
-
-  const root = tree.getRoot().toString('hex');
-  console.log('Merkle Root:', root);
-
-  const leaf = leaves[1];
-  const proof = tree.getProof(leaf).map((x) => '0x' + x.data.toString('hex'));
-  const proofIndices = proof.map((x) => (x.position === 'right' ? 1 : 0));
-
-  console.log('Proof:', proof);
-  console.log('Proof indices:', proofIndices);
-}
-
-main();
+// proof.siblings → Noir 서킷에서 쓰는 hash_path와 동일
+// proof.leafIdx → index
+// proof.root → 머클 루트
