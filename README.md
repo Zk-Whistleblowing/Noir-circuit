@@ -1,3 +1,5 @@
+<pre>
+```bash
 # Install dependencies
 npm install
 
@@ -9,3 +11,5 @@ node merkle_test.js
 
 # Run Noir tests
 nargo test
+```
+</pre>
