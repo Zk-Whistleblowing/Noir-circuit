@@ -173,6 +173,8 @@ fn main(
     leafValue: Field,
     root: Field,
     siblings: [Field; 32],
+    secret: Field, // private input for nullifier generation
+    nullifier: pub Field,
 ) {
     verifyProof(
         leafIdx,
@@ -183,6 +185,10 @@ fn main(
         root,
         siblings,
     );
+
+    // Verify that nullifier is correctly derived from secret and leafKey
+    let expected_nullifier = hash_2([secret, leafKey as Field]);
+    assert(nullifier == expected_nullifier);
 }
 
 #[test]
